@@ -1,11 +1,11 @@
 #!/bin/bash
 
 K_NAME="Intelli-Kernel"
-K_VERSION="v15"
+K_VERSION="v16b2"
 
 cp defconfig .config
 find arch/arm/boot/ -name "*.dtb" -type f -delete
-case "$1" in
+case "kltedv" in
 	klte)
     make ARCH=arm oldconfig
     echo "Compiling kernel for klte"
@@ -184,9 +184,9 @@ esac
 
 DATE_START=$(date +"%s")
 
-export KBUILD_COMPILER_STRING=$(~/clang/bin/clang --version | head -n 1 | perl -pe 's/\(http.*?\)//gs' | sed -e 's/  */ /g' -e 's/[[:space:]]*$//')
+export KBUILD_COMPILER_STRING=$(~/google-clang/bin/clang --version | head -n 1 | perl -pe 's/\(http.*?\)//gs' | sed -e 's/  */ /g' -e 's/[[:space:]]*$//')
 
-make ARCH=arm CC="ccache /home/pascua14/clang/bin/clang" \
+make ARCH=arm CC="ccache /home/smg/google-clang/bin/clang" \
 CLANG_TRIPLE=arm-linux-gnueabihf- \
 CROSS_COMPILE=arm-linux-gnueabihf- \
 -j$(nproc --all) 2>&1 | tee ../compile.log
@@ -210,3 +210,6 @@ if [ "$K_VERSION" == "test" ]; then
 fi
 
 echo "Time: $(($DIFF / 60)) minute(s) and $(($DIFF % 60)) seconds."
+cd ..
+cd ..
+mv $ZIP_NAME /mnt/c/Users/notebook-sung/Desktop

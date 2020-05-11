@@ -3,7 +3,7 @@
  *
  * Copyright (C) 2010 Google, Inc.
  * Copyright (C) 2014 Paul Reioux
- * Copyright (C) 2020 Samuel Pascua
+ * Copyright (C) 2020 Samuel Pascua & SmgKhOaRn
  *
  * This software is licensed under the terms of the GNU General Public
  * License version 2, as published by the Free Software Foundation, and
@@ -122,7 +122,7 @@ static u64 boostpulse_endtime;
 #define DEFAULT_TIMER_SLACK (4 * DEFAULT_TIMER_RATE)
 static int timer_slack_val = DEFAULT_TIMER_SLACK;
 
-static bool io_is_busy = 1;
+static bool io_is_busy = 0;
 
 /*
  * If the max load among other CPUs is higher than up_threshold_any_cpu_load
@@ -131,10 +131,8 @@ static bool io_is_busy = 1;
  * sync_freq
  */
 static unsigned int up_threshold_any_cpu_load = 95;
-static unsigned int sync_freq = 729600;
+static unsigned int sync_freq = 300000;
 static unsigned int up_threshold_any_cpu_freq = 960000;
-static unsigned int touchboost_limit = 1497000;
-static int touchboost_step = 2;
 
 static int two_phase_freq_array[NR_CPUS] = {[0 ... NR_CPUS-1] = 1728000} ;
 
@@ -286,7 +284,7 @@ static unsigned int choose_freq(
 	unsigned int freq = pcpu->policy->cur;
 	unsigned int prevfreq, freqmin, freqmax;
 	unsigned int tl;
-	unsigned int index;
+	int index;
 
 	freqmin = 0;
 	freqmax = UINT_MAX;
@@ -692,40 +690,20 @@ static int cpufreq_interactive_speedchange_task(void *data)
 	return 0;
 }
 
-static DEFINE_PER_CPU(struct cpufreq_frequency_table *, cpufreq_table);
-static int boost_running = 0;
-
-static void cpufreq_interactive_boost(bool touchevent)
+static void cpufreq_interactive_boost(void)
 {
-	int i, rc;
+	int i;
 	int anyboost = 0;
-	unsigned int idx;
 	unsigned long flags;
 	struct cpufreq_interactive_cpuinfo *pcpu;
 
-	boost_running = 1;
 	spin_lock_irqsave(&speedchange_cpumask_lock, flags);
 
 	for_each_online_cpu(i) {
 		pcpu = &per_cpu(cpuinfo, i);
 
 		if (pcpu->target_freq < hispeed_freq) {
-			if (touchevent && pcpu->policy->cur < touchboost_limit) {
-				rc = cpufreq_frequency_table_target(
-					pcpu->policy, pcpu->freq_table,
-					pcpu->policy->cur, CPUFREQ_RELATION_C,
-					&idx);
-
-				if (rc < 0) {
-					spin_unlock_irqrestore(&speedchange_cpumask_lock, flags);
-					return;
-				}
-
-				idx += touchboost_step;
-				pcpu->target_freq = pcpu->freq_table[idx].frequency >= touchboost_limit ?
-									touchboost_limit : pcpu->freq_table[idx].frequency;
-			} else
-				pcpu->target_freq = hispeed_freq;
+			pcpu->target_freq = hispeed_freq;
 			cpumask_set_cpu(i, &speedchange_cpumask);
 			pcpu->hispeed_validate_time =
 				ktime_to_us(ktime_get());
@@ -745,8 +723,6 @@ static void cpufreq_interactive_boost(bool touchevent)
 
 	if (anyboost)
 		wake_up_process(speedchange_task);
-
-	boost_running = 0;
 }
 
 static int cpufreq_interactive_notifier(
@@ -1120,9 +1096,9 @@ static ssize_t store_boost(struct kobject *kobj, struct attribute *attr,
 
 	boost_val = val;
 
-	if (boost_val)
-		if (!boost_running)
-			cpufreq_interactive_boost(false);
+	if (boost_val) {
+		cpufreq_interactive_boost();
+	}
 
 	return count;
 }
@@ -1140,9 +1116,7 @@ static ssize_t store_boostpulse(struct kobject *kobj, struct attribute *attr,
 		return ret;
 
 	boostpulse_endtime = ktime_to_us(ktime_get()) + boostpulse_duration_val;
-
-	if (!boost_running)
-		cpufreq_interactive_boost(false);
+	cpufreq_interactive_boost();
 	return count;
 }
 
@@ -1291,8 +1265,7 @@ static void interactive_input_event(struct input_handle *handle,
 	if (type == EV_SYN && code == SYN_REPORT) {
 		boostpulse_endtime = ktime_to_us(ktime_get()) +
 			boostpulse_duration_val;
-		if (!boost_running)
-			cpufreq_interactive_boost(true);
+		cpufreq_interactive_boost();
 	}
 }
 
@@ -1577,4 +1550,3 @@ MODULE_AUTHOR("Samuel Pascua <sgpascua@ngcp.ph>");
 MODULE_DESCRIPTION("'cpufreq_intelliactive' - A cpufreq governor for "
 	"Latency sensitive workloads based on Google's Interactive");
 MODULE_LICENSE("GPL");
-
