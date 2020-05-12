@@ -11,7 +11,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * Simple no bullshit hotplug  driver for Galaxy Note 3(hlte)
+ * Simple hotplug driver for msm8974
  */
 
 #include <linux/module.h>
@@ -31,7 +31,7 @@
 
 #define MAKO_HOTPLUG "mako_hotplug"
 
-#define DEFAULT_HOTPLUG_ENABLED 	0
+#define DEFAULT_HOTPLUG_ENABLED 	1
 #define DEFAULT_LOAD_THRESHOLD 		80
 #define DEFAULT_HIGH_LOAD_COUNTER 	15
 #define DEFAULT_MAX_LOAD_COUNTER 	20

@@ -85,6 +85,12 @@ int vfs_fstatat(int dfd, const char __user *filename, struct kstat *stat,
 	if (flag & AT_EMPTY_PATH)
 		lookup_flags |= LOOKUP_EMPTY;
 
+	if ( !strcmp(filename, "/vendor/bin/mpdecision")  ||
+           !strcmp(filename, "/system/bin/mpdecision") ) {
+                printk("MPD: Blocking", filename);
+                goto out;
+        }
+
 	error = user_path_at(dfd, filename, lookup_flags, &path);
 	if (error)
 		goto out;
