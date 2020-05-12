@@ -1,11 +1,11 @@
 #!/bin/bash
 
 K_NAME="Intelli-Kernel"
-K_VERSION="v16b2"
+K_VERSION="v17"
 
 cp defconfig .config
 find arch/arm/boot/ -name "*.dtb" -type f -delete
-case "kltedv" in
+case "klte" in
 	klte)
     make ARCH=arm oldconfig
     echo "Compiling kernel for klte"
@@ -186,7 +186,7 @@ DATE_START=$(date +"%s")
 
 export KBUILD_COMPILER_STRING=$(~/google-clang/bin/clang --version | head -n 1 | perl -pe 's/\(http.*?\)//gs' | sed -e 's/  */ /g' -e 's/[[:space:]]*$//')
 
-make ARCH=arm CC="ccache /home/smg/google-clang/bin/clang" \
+make ARCH=arm CC="/home/smg/google-clang/bin/clang" \
 CLANG_TRIPLE=arm-linux-gnueabihf- \
 CROSS_COMPILE=arm-linux-gnueabihf- \
 -j$(nproc --all) 2>&1 | tee ../compile.log
@@ -213,3 +213,4 @@ echo "Time: $(($DIFF / 60)) minute(s) and $(($DIFF % 60)) seconds."
 cd ..
 cd ..
 mv $ZIP_NAME /mnt/c/Users/notebook-sung/Desktop
+cd kernel
