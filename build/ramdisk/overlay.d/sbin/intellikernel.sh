@@ -14,10 +14,14 @@ echo '0' > /sys/module/lowmemorykiller/parameters/enable_adaptive_lmk;
 chmod 640 /sys/fs/selinux/enforce;
 chmod 440 /sys/fs/selinux/policy;
 
+# Set Smart Dim
+echo '1' > /sys/class/graphics/fb0/smart_dim
+
 # Set I/O scheduler
-setprop sys.io.scheduler zen;
+echo 'zen' > /sys/block/mmcblk0/queue/scheduler;
 echo '1024' > /sys/block/mmcblk0/queue/read_ahead_kb;
 echo '0' > /sys/block/mmcblk0/queue/iostats;
+echo 'zen' > /sys/block/mmcblk1/queue/scheduler;
 echo '2048' > /sys/block/mmcblk1/queue/read_ahead_kb;
 echo '0' > /sys/block/mmcblk1/queue/iostats;
 echo '256' > /proc/sys/kernel/random/read_wakeup_threshold;

@@ -118,7 +118,7 @@ CONFIG_SND_SOC_ES704_TEMP=y
 CONFIG_USB_LOCK_SUPPORT_FOR_MDM=y
 CONFIG_SENSORS_SSP_SHTC1=y
 " >> .config
-
+-
     make ARCH=arm oldconfig
     echo "Compiling kernel for kltekor"
     DEVICE_NAME="kltekor"
@@ -184,11 +184,11 @@ esac
 
 DATE_START=$(date +"%s")
 
-export KBUILD_COMPILER_STRING=$(~/google-clang/bin/clang --version | head -n 1 | perl -pe 's/\(http.*?\)//gs' | sed -e 's/  */ /g' -e 's/[[:space:]]*$//')
+export KBUILD_COMPILER_STRING=$(~/lolz-clang/bin/clang --version | head -n 1 | perl -pe 's/\(http.*?\)//gs' | sed -e 's/  */ /g' -e 's/[[:space:]]*$//')
 
-make ARCH=arm CC="/home/smg/google-clang/bin/clang" \
-CLANG_TRIPLE=arm-linux-gnueabihf- \
-CROSS_COMPILE=arm-linux-gnueabihf- \
+make ARCH=arm CC="/home/smg/lolz-clang/bin/clang" \
+CLANG_TRIPLE="/home/smg/lolz-clang/bin/arm-linux-gnueabi-" \
+CROSS_COMPILE="/home/smg/lolz-clang/bin/arm-linux-gnueabi-" \
 -j$(nproc --all) 2>&1 | tee ../compile.log
 
 tools/dtbTool -2 -o arch/arm/boot/dtb -s 2048 -p scripts/dtc/ arch/arm/boot/
