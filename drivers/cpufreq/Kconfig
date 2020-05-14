@@ -200,6 +200,11 @@ config CPU_FREQ_DEFAULT_GOV_YANKACTIVE
 	   loading your cpufreq low-level hardware driver, using the
 	   'yankactive' governor for latency-sensitive workloads.
 
+config CPU_FREQ_DEFAULT_GOV_LOLZNAPPY
+	bool "lolznappy"
+	select CPU_FREQ_GOV_LOLZNAPPY
+	help
+
 endchoice
 
 config CPU_FREQ_GOV_PERFORMANCE
@@ -377,6 +382,24 @@ config CPU_FREQ_GOV_YANKACTIVE
 	  The governor is based on interactive with just different default settings
 	  and can be achieved using interactive with a script. This is added for
 	  simplification purposes for myself.
+
+config CPU_FREQ_GOV_LOLZNAPPY
+	tristate "'lolzsnappy' cpufreq policy governor"
+	default y
+	help
+	  'lolznappy' - This driver adds a dynamic cpufreq policy governor
+	  designed for latency-sensitive workloads.
+
+	  This governor attempts to reduce the latency of clock
+	  increases so that the system is more responsive to
+	  interactive workloads.
+
+	  To compile this driver as a module, choose M here: the
+	  module will be called cpufreq_lolznappy.
+
+	  For details, take a look at linux/Documentation/cpu-freq.
+
+	  If in doubt, say N.
 
 config CPU_INPUT_BOOST
 	bool "CPU Input Boost"
