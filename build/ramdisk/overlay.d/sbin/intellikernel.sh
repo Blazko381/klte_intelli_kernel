@@ -35,7 +35,11 @@ chmod 0444 /sys/block/mmcblk1/queue/read_ahead_kb;
 echo "256" > /proc/sys/kernel/random/read_wakeup_threshold;
 echo "320" > /proc/sys/kernel/random/write_wakeup_threshold;
 
-# Set CPU governor
+# Set CPU governor & freq
+echo '2265600' > /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq;
+echo '2265600' > /sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq;
+echo '2265600' > /sys/devices/system/cpu/cpu2/cpufreq/scaling_max_freq;
+echo '2265600' > /sys/devices/system/cpu/cpu3/cpufreq/scaling_max_freq;
 echo 'intelliactive' > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor;
 echo 'intelliactive' > /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor;
 echo 'intelliactive' > /sys/devices/system/cpu/cpu2/cpufreq/scaling_governor;
